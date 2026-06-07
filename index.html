@@ -45,10 +45,10 @@
     font-family: 'Nunito', sans-serif;
     overflow-x: hidden;
     color: var(--text);
-    min-height: 100vh;
+    min-height: 100svh;
   }
 
-  /* ═══ FLOATING DECORATIONS ═══ */
+  /* ═══ FLOATING DECORATIONS — desktop only ═══ */
   .floating-deco {
     position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden;
   }
@@ -66,11 +66,12 @@
     100% { transform: translateY(-10vh) translateX(var(--drift, 30px)) rotate(var(--spin, 360deg)) scale(var(--sc, 1)); opacity: 0; }
   }
 
-  /* ═══ PASTEL BLOBS ═══ */
+  /* ═══ PASTEL BLOBS — desktop only ═══ */
   .blob-layer { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
   .blob {
     position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.2;
     animation: blobFloat var(--d, 10s) ease-in-out infinite;
+    will-change: transform;
   }
   @keyframes blobFloat {
     0%, 100% { transform: translate(0, 0) scale(1); }
@@ -169,6 +170,11 @@
     .deco, .blob, .confetti-piece, .click-sparkle { display: none !important; }
   }
 
+  /* ═══ HIDE HEAVY LAYERS ON MOBILE ═══ */
+  @media (max-width: 768px) {
+    .floating-deco, .blob-layer { display: none !important; }
+  }
+
   /* ═══ SCROLL REVEAL ═══ */
   .reveal {
     opacity: 0; transform: translateY(45px);
@@ -179,7 +185,7 @@
   /* ═══ HERO ═══ */
   .hero {
     position: relative; z-index: 1;
-    min-height: 100vh;
+    min-height: 100svh;
     display: flex; flex-direction: column; align-items: center; justify-content: center;
     text-align: center; padding: 80px 24px 60px;
   }
@@ -221,6 +227,7 @@
     animation: float 3.5s ease-in-out infinite, bounceIn 0.9s 0.5s both;
     cursor: pointer;
     transition: transform 0.2s;
+    -webkit-tap-highlight-color: transparent;
   }
   .cake-wrapper:hover { transform: scale(1.05); }
   .cake-wrapper:active { transform: scale(0.97); }
@@ -258,7 +265,6 @@
     background: linear-gradient(180deg, #ddd6fe, #c4b5fd);
     border-radius: 8px 8px 0 0;
   }
-  /* Frosting drips */
   .drip { position: absolute; background: #e9d5ff; border-radius: 0 0 50% 50%; }
   .drip:nth-child(1) { width: 8px; height: 12px; top: 8px; left: 12px; }
   .drip:nth-child(2) { width: 10px; height: 16px; top: 8px; left: 35px; }
@@ -278,7 +284,6 @@
     border-radius: 6px 6px 0 0;
   }
 
-  /* Sprinkles */
   .sprinkle {
     position: absolute; width: 4px; height: 10px; border-radius: 3px;
   }
@@ -289,7 +294,6 @@
   .sprinkle:nth-child(5) { background: var(--mint); bottom: 18px; left: 55px; transform: rotate(15deg); }
   .sprinkle:nth-child(6) { background: var(--peach); bottom: 48px; left: 28px; transform: rotate(-50deg); }
 
-  /* Candles */
   .candle {
     position: absolute; bottom: 108px; width: 6px; height: 22px;
     border-radius: 2px 2px 0 0;
@@ -324,13 +328,22 @@
 
   /* ═══ HERO CARD ═══ */
   .hero-card {
-    background: var(--glass);
+    background: rgba(255, 255, 255, 0.82);
     border: 1.5px solid var(--glass-border);
     border-radius: 28px; padding: 38px 44px;
     max-width: 580px; margin: 0 auto 50px;
-    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    /* backdrop-filter only on capable desktop devices */
     animation: slideUp 0.8s 1s both, glowPulse 5s ease-in-out infinite;
     position: relative; overflow: hidden;
+  }
+  @supports (backdrop-filter: blur(1px)) {
+    @media (min-width: 769px) {
+      .hero-card {
+        background: var(--glass);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+      }
+    }
   }
   .hero-card::before {
     content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
@@ -390,14 +403,22 @@
   }
 
   .wish-card {
-    background: var(--card-bg, var(--glass));
+    background: var(--card-bg, rgba(255,255,255,0.75));
     border: 1.5px solid var(--card-border, var(--glass-border));
     border-radius: 24px; padding: 32px 26px;
     text-align: center; cursor: default;
-    backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
     animation: popIn 0.6s var(--delay, 0.1s) both;
     transition: all 0.35s cubic-bezier(0.22, 1, 0.36, 1);
     position: relative; overflow: hidden;
+  }
+  /* backdrop-filter on wish cards — desktop only */
+  @supports (backdrop-filter: blur(1px)) {
+    @media (min-width: 769px) {
+      .wish-card {
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+      }
+    }
   }
   .wish-card::before {
     content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
@@ -438,6 +459,8 @@
     box-shadow: 0 6px 25px rgba(255, 182, 193, 0.4);
     transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.2s;
     overflow: hidden;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
   }
   .surprise-btn:hover {
     transform: scale(1.06) translateY(-2px);
@@ -457,14 +480,22 @@
   }
 
   .from-card {
-    background: linear-gradient(135deg, rgba(255, 182, 193, 0.15), rgba(216, 180, 254, 0.1), rgba(186, 230, 253, 0.1));
+    background: rgba(255, 255, 255, 0.82);
     border: 1.5px solid rgba(255, 255, 255, 0.6);
     border-radius: 28px; padding: 46px 48px;
     text-align: center;
-    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
     box-shadow: 0 8px 40px rgba(180, 140, 200, 0.12);
     animation: popIn 0.7s 0.2s both;
     position: relative; overflow: hidden;
+  }
+  @supports (backdrop-filter: blur(1px)) {
+    @media (min-width: 769px) {
+      .from-card {
+        background: linear-gradient(135deg, rgba(255, 182, 193, 0.15), rgba(216, 180, 254, 0.1), rgba(186, 230, 253, 0.1));
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+      }
+    }
   }
   .from-card::before {
     content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
@@ -524,6 +555,8 @@
     box-shadow: 0 6px 25px rgba(192, 132, 252, 0.35);
     transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
     overflow: hidden;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
   }
   .unlock-btn:hover { transform: scale(1.06); }
   .unlock-btn:active { transform: scale(0.96); }
@@ -551,14 +584,21 @@
   .positives-container.active { display: block; }
 
   .positive-card {
-    background: var(--glass);
+    background: rgba(255, 255, 255, 0.82);
     border: 1.5px solid var(--glass-border);
     border-radius: 22px; padding: 24px 28px; margin-bottom: 14px;
     display: flex; align-items: center; gap: 18px;
     text-align: left; opacity: 0;
-    backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
     position: relative; overflow: hidden;
     transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s;
+  }
+  @supports (backdrop-filter: blur(1px)) {
+    @media (min-width: 769px) {
+      .positive-card {
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+      }
+    }
   }
   .positive-card:hover {
     transform: translateY(-5px);
@@ -680,7 +720,7 @@
 </head>
 <body>
 
-<!-- ═══ FLOATING DECORATIONS ═══ -->
+<!-- ═══ FLOATING DECORATIONS (hidden on mobile via CSS) ═══ -->
 <div class="floating-deco" id="floatingDeco"></div>
 <div class="blob-layer" id="blobLayer"></div>
 
@@ -731,17 +771,17 @@
 <section class="section" id="wishes-section">
   <h2 class="section-heading reveal">Birthday Wishes</h2>
   <div class="wishes-grid">
-    <div class="wish-card reveal" style="--delay:0.1s; --card-bg:rgba(255,182,193,0.12); --card-border:rgba(255,182,193,0.35); --card-stripe:linear-gradient(90deg,#ffb6c1,#fda4af); --card-shadow:rgba(255,182,193,0.25); --card-title:#f472b6;">
+    <div class="wish-card reveal" style="--delay:0.1s; --card-bg:rgba(255,182,193,0.18); --card-border:rgba(255,182,193,0.35); --card-stripe:linear-gradient(90deg,#ffb6c1,#fda4af); --card-shadow:rgba(255,182,193,0.25); --card-title:#f472b6;">
       <span class="wish-icon">🎉</span>
       <p class="wish-title">Party Hard</p>
       <p class="wish-desc">This incredibly special day ofcoursee needss celebration</p>
     </div>
-    <div class="wish-card reveal" style="--delay:0.25s; --card-bg:rgba(216,180,254,0.12); --card-border:rgba(216,180,254,0.35); --card-stripe:linear-gradient(90deg,#d8b4fe,#c084fc); --card-shadow:rgba(192,132,252,0.2); --card-title:#a78bfa;">
+    <div class="wish-card reveal" style="--delay:0.25s; --card-bg:rgba(216,180,254,0.18); --card-border:rgba(216,180,254,0.35); --card-stripe:linear-gradient(90deg,#d8b4fe,#c084fc); --card-shadow:rgba(192,132,252,0.2); --card-title:#a78bfa;">
       <span class="wish-icon">🤧</span>
       <p class="wish-title">A Request</p>
       <p class="wish-desc">Dont forget this boring friend (myself), after my final year (2027) </p>
     </div>
-    <div class="wish-card reveal" style="--delay:0.4s; --card-bg:rgba(167,243,208,0.12); --card-border:rgba(167,243,208,0.35); --card-stripe:linear-gradient(90deg,#a7f3d0,#6ee7b7); --card-shadow:rgba(110,231,183,0.2); --card-title:#34d399;">
+    <div class="wish-card reveal" style="--delay:0.4s; --card-bg:rgba(167,243,208,0.18); --card-border:rgba(167,243,208,0.35); --card-stripe:linear-gradient(90deg,#a7f3d0,#6ee7b7); --card-shadow:rgba(110,231,183,0.2); --card-title:#34d399;">
       <span class="wish-icon">💫</span>
       <p class="wish-title">Success Ahead</p>
       <p class="wish-desc">May this year bring you lots of happiness, joy anddd successs for sureee </p>
@@ -789,7 +829,6 @@
   <div class="done-msg" id="doneMsg"></div>
 </section>
 
-
 <!-- ═══ FOOTER ═══ -->
 <footer class="footer reveal">
   <span class="footer-emoji">🎈🎉🎊🎂🎈</span>
@@ -799,15 +838,16 @@
 
 
 <script>
-/* ═══ FLOATING DECORATIONS ═══ */
+/* ═══ FLOATING DECORATIONS (desktop only — JS checks screen width) ═══ */
 (function() {
+  if (window.innerWidth <= 768) return; // skip on mobile entirely
   const container = document.getElementById('floatingDeco');
   const items = [
     '♡','✦','🦋','❀','★','🌸','♡','✧','🌷','💐',
     '♡','✦','🦋','❀','★','🌸','♡','✧','🌷','✿',
     '♡','★','🦋','❀','✦','🌸','♡','✧'
   ];
-  items.forEach((emoji, i) => {
+  items.forEach((emoji) => {
     const el = document.createElement('span');
     el.className = 'deco';
     el.textContent = emoji;
@@ -827,8 +867,9 @@
   });
 })();
 
-/* ═══ PASTEL BLOBS ═══ */
+/* ═══ PASTEL BLOBS (desktop only) ═══ */
 (function() {
+  if (window.innerWidth <= 768) return;
   const colors = ['#ffb6c1','#d8b4fe','#bae6fd','#a7f3d0','#fde68a','#fcd5b4'];
   const el = document.getElementById('blobLayer');
   colors.forEach((c, i) => {
@@ -852,7 +893,9 @@
 const confettiColors = ['#ffb6c1','#d8b4fe','#bae6fd','#a7f3d0','#fde68a','#fcd5b4','#fda4af','#c4b5fd','#fff'];
 
 function burstConfetti(n = 50) {
-  for (let i = 0; i < n; i++) {
+  // Limit confetti count on mobile to avoid performance issues
+  const count = window.innerWidth <= 768 ? Math.min(n, 30) : n;
+  for (let i = 0; i < count; i++) {
     const p = document.createElement('div');
     p.className = 'confetti-piece';
     const size = 5 + Math.random() * 8;
@@ -870,13 +913,15 @@ function burstConfetti(n = 50) {
   }
 }
 
-/* ═══ CLICK-ANYWHERE SPARKLES ═══ */
+/* ═══ CLICK/TAP SPARKLES ═══ */
 document.addEventListener('click', function(e) {
   const sparkleColors = ['#ffb6c1','#d8b4fe','#bae6fd','#a7f3d0','#fde68a','#fda4af'];
-  for (let i = 0; i < 8; i++) {
+  // Fewer sparkles on mobile
+  const count = window.innerWidth <= 768 ? 5 : 8;
+  for (let i = 0; i < count; i++) {
     const s = document.createElement('div');
     s.className = 'click-sparkle';
-    const angle = (i / 8) * Math.PI * 2;
+    const angle = (i / count) * Math.PI * 2;
     const dist = 15 + Math.random() * 25;
     const x = e.clientX + Math.cos(angle) * dist;
     const y = e.clientY + Math.sin(angle) * dist;
@@ -891,21 +936,25 @@ document.addEventListener('click', function(e) {
   }
 });
 
-/* ═══ CAKE CLICK → CONFETTI ═══ */
+/* ═══ CAKE CLICK → CONFETTI + SHAKE ═══ */
 document.getElementById('cakeClick').addEventListener('click', function(e) {
   e.stopPropagation();
   burstConfetti(60);
+  document.body.classList.remove('shaking');
+  void document.body.offsetWidth;
+  document.body.classList.add('shaking');
+  setTimeout(() => document.body.classList.remove('shaking'), 650);
 });
 
 /* ═══ SURPRISE BUTTON ═══ */
 document.getElementById('surpriseBtn').addEventListener('click', function(e) {
   e.stopPropagation();
   burstConfetti(80);
-  // Extra sparkle burst at button
-  for (let i = 0; i < 16; i++) {
+  const count = window.innerWidth <= 768 ? 8 : 16;
+  for (let i = 0; i < count; i++) {
     const s = document.createElement('div');
     s.className = 'click-sparkle';
-    const angle = (i / 16) * Math.PI * 2;
+    const angle = (i / count) * Math.PI * 2;
     const dist = 30 + Math.random() * 50;
     const rect = this.getBoundingClientRect();
     const cx = rect.left + rect.width / 2;
@@ -977,7 +1026,10 @@ document.getElementById('surpriseBtn').addEventListener('click', function(e) {
     });
 
     const dot = document.getElementById('dot' + i);
-    if (dot) { dot.classList.add('active'); if (i > 0) document.getElementById('dot' + (i - 1)).classList.replace('active', 'done'); }
+    if (dot) {
+      dot.classList.add('active');
+      if (i > 0) document.getElementById('dot' + (i - 1)).classList.replace('active', 'done');
+    }
 
     burstConfetti(35);
     card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
@@ -998,22 +1050,7 @@ document.getElementById('surpriseBtn').addEventListener('click', function(e) {
     revealNext();
   });
 })();
-
-/* ═══ SCREEN SHAKE ON CAKE ═══ */
-document.getElementById('cakeClick').addEventListener('click', function() {
-  document.body.classList.remove('shaking');
-  void document.body.offsetWidth;
-  document.body.classList.add('shaking');
-  setTimeout(() => document.body.classList.remove('shaking'), 650);
-});
-
 </script>
-
-    </div>
-  </div>
-</div>
-
-
 
 </body>
 </html>
