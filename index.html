@@ -188,6 +188,7 @@
     min-height: 100svh;
     display: flex; flex-direction: column; align-items: center; justify-content: center;
     text-align: center; padding: 80px 24px 60px;
+    overflow: hidden;
   }
 
   .badge {
@@ -228,7 +229,12 @@
     cursor: pointer;
     transition: transform 0.2s;
     -webkit-tap-highlight-color: transparent;
+    padding-top: 18px;
   }
+
+  /* Hide flames bleeding outside cake area */
+  .cake-container { overflow: visible; }
+  .candle-flame { clip-path: none; }
   .cake-wrapper:hover { transform: scale(1.05); }
   .cake-wrapper:active { transform: scale(0.97); }
 
@@ -303,12 +309,7 @@
   .candle:nth-child(3) { left: 92px; background: linear-gradient(180deg, var(--sky), var(--sky-deep)); }
 
   .candle-flame {
-    position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
-    width: 8px; height: 12px;
-    background: radial-gradient(ellipse, #fff7a0 20%, #fde68a 50%, #fdba74 80%, transparent);
-    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
-    animation: flicker 0.8s ease-in-out infinite;
-    box-shadow: 0 0 8px rgba(253, 230, 138, 0.6), 0 0 20px rgba(253, 186, 116, 0.3);
+    display: none;
   }
   .candle:nth-child(2) .candle-flame { animation-delay: 0.2s; }
   .candle:nth-child(3) .candle-flame { animation-delay: 0.4s; }
