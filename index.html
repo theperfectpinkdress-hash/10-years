@@ -107,15 +107,6 @@
     0% { transform: translateY(-10px) rotate(0deg); opacity: 1; }
     100% { transform: translateY(105vh) rotate(720deg); opacity: 0; }
   }
-  /* slow, swaying fall used for the "shake to celebrate" confetti — dreamier & floatier */
-  @keyframes confettiDreamFall {
-    0%   { transform: translate(0, -10px) rotate(0deg); opacity: 0; }
-    10%  { opacity: 0.9; }
-    30%  { transform: translate(calc(var(--sway) * -1), 28vh) rotate(calc(var(--spin) * 0.3)); }
-    55%  { transform: translate(calc(var(--sway) * 0.6), 54vh) rotate(calc(var(--spin) * 0.55)); }
-    80%  { transform: translate(calc(var(--sway) * -0.35), 82vh) rotate(calc(var(--spin) * 0.8)); opacity: 0.85; }
-    100% { transform: translate(0, 106vh) rotate(var(--spin)); opacity: 0; }
-  }
   @keyframes sparkle {
     0% { transform: scale(0) rotate(0deg); opacity: 1; }
     50% { transform: scale(1) rotate(180deg); opacity: 1; }
@@ -670,7 +661,6 @@
 
   /* ═══ CONFETTI & SPARKLE ═══ */
   .confetti-piece { position: fixed; pointer-events: none; z-index: 999; }
-  .confetti-piece.dreamy { filter: blur(0.5px); }
   .click-sparkle {
     position: fixed; pointer-events: none; z-index: 998;
     width: 8px; height: 8px;
@@ -1060,89 +1050,6 @@ document.getElementById('surpriseBtn').addEventListener('click', function(e) {
     e.stopPropagation();
     revealNext();
   });
-})();
-
-/* ═══ DREAMY CONFETTI — soft, slow, swaying fall (used when the phone is shaken) ═══ */
-function burstConfettiDreamy(n = 45) {
-  const count = window.innerWidth <= 768 ? Math.min(n, 28) : n;
-  for (let i = 0; i < count; i++) {
-    const p = document.createElement('div');
-    p.className = 'confetti-piece dreamy';
-    const size = 6 + Math.random() * 11;
-    const shape = Math.random() > 0.5 ? '50%' : Math.random() > 0.5 ? '3px' : '0';
-    const color = confettiColors[Math.floor(Math.random() * confettiColors.length)];
-    const dur = 4.5 + Math.random() * 3.5;   // slower than the punchy burst
-    const delay = Math.random() * 1.4;
-    const sway = 60 + Math.random() * 120;    // px, side-to-side drift
-    const spin = 160 + Math.random() * 300;   // deg, gentler spin
-    p.style.cssText = `
-      left:${Math.random() * 100}vw; top:-20px;
-      width:${size}px; height:${size * 0.65}px;
-      background:${color};
-      border-radius:${shape};
-      opacity:0;
-      box-shadow:0 0 7px ${color}aa;
-      --sway:${sway}px; --spin:${spin}deg;
-      animation:confettiDreamFall ${dur}s ${delay}s cubic-bezier(0.45,0,0.55,1) forwards;
-    `;
-    document.body.appendChild(p);
-    setTimeout(() => p.remove(), (dur + delay) * 1000 + 300);
-  }
-}
-
-/* ═══ SHAKE-TO-CELEBRATE (mobile device motion) ═══ */
-(function() {
-  if (!('DeviceMotionEvent' in window)) return; // no motion sensor support, skip quietly
-
-  let lastX = null, lastY = null, lastZ = null;
-  let lastShakeTime = 0;
-  const SHAKE_THRESHOLD = 18;   // raise to make it less sensitive, lower to make it easier to trigger
-  const COOLDOWN_MS = 2200;     // prevents repeated triggers from one shake
-
-  function triggerShakeConfetti() {
-    document.body.classList.remove('shaking');
-    void document.body.offsetWidth;
-    document.body.classList.add('shaking');
-    setTimeout(() => document.body.classList.remove('shaking'), 650);
-
-    burstConfettiDreamy(50);
-    setTimeout(() => burstConfettiDreamy(30), 350);
-  }
-
-  function handleMotion(e) {
-    const acc = e.accelerationIncludingGravity || e.acceleration;
-    if (!acc || acc.x === null || acc.y === null || acc.z === null) return;
-
-    if (lastX !== null) {
-      const delta = Math.abs(acc.x - lastX) + Math.abs(acc.y - lastY) + Math.abs(acc.z - lastZ);
-      const now = Date.now();
-      if (delta > SHAKE_THRESHOLD && now - lastShakeTime > COOLDOWN_MS) {
-        lastShakeTime = now;
-        triggerShakeConfetti();
-      }
-    }
-    lastX = acc.x; lastY = acc.y; lastZ = acc.z;
-  }
-
-  function startListening() {
-    window.addEventListener('devicemotion', handleMotion);
-  }
-
-  // iOS 13+ requires explicit permission, and that request must come from
-  // a real user gesture — so we ask on the first tap anywhere on the page.
-  if (typeof DeviceMotionEvent.requestPermission === 'function') {
-    const askPermission = function() {
-      DeviceMotionEvent.requestPermission().then(state => {
-        if (state === 'granted') startListening();
-      }).catch(() => {});
-      document.removeEventListener('click', askPermission);
-      document.removeEventListener('touchend', askPermission);
-    };
-    document.addEventListener('click', askPermission, { once: true });
-    document.addEventListener('touchend', askPermission, { once: true });
-  } else {
-    startListening(); // Android / other browsers: no permission needed
-  }
 })();
 </script>
 
